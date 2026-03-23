@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Car Shopping AI — Apex Pitch</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #07080c;
+      --c1: #818cf8; --c1d: rgba(99,102,241,.18);
+      --c2: #22d3ee; --c2d: rgba(6,182,212,.18);
+      --c3: #34d399; --c3d: rgba(16,185,129,.18);
+      --c4: #fbbf24; --c4d: rgba(245,158,11,.18);
+      --c5: #60a5fa; --c5d: rgba(59,130,246,.18);
+      --c6: #f87171; --c6d: rgba(239,68,68,.18);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      color: #e2e8f0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── ambient glows ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 10%, rgba(99,102,241,.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 80% 80%, rgba(16,185,129,.05) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── hero ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 72px 24px 56px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(129,140,248,.1);
+      border: 1px solid rgba(129,140,248,.25);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #818cf8;
+      margin-bottom: 28px;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #818cf8;
+      box-shadow: 0 0 8px #818cf8;
+    }
+
+    .hero h1 {
+      font-size: clamp(32px, 6vw, 58px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, #818cf8, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      margin-top: 16px;
+      color: #475569;
+      font-size: 14px;
+      letter-spacing: .06em;
+    }
+
+    .hero-sub b { color: #64748b; font-weight: 500; }
+
+    .hero-divider {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, transparent, #1e2a3a, transparent);
+      margin: 40px auto 0;
+    }
+
+    /* ── grid ── */
+    .grid {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ── card ── */
+    .card {
+      position: relative;
+      border-radius: 18px;
+      padding: 2px; /* border thickness via gradient wrapper */
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .card:hover { transform: translateY(-2px); }
+
+    .card-border {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      padding: 1.5px;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .card-inner {
+      background: #0d1117;
+      border-radius: 17px;
+      padding: 28px 32px 26px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* big ghost number behind card content */
+    .card-ghost {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 120px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1;
+      opacity: .04;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .step-pill {
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: .08em;
+      padding: 4px 11px;
+      border-radius: 100px;
+    }
+
+    .tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 100px;
+      opacity: .75;
+    }
+
+    .card-title {
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: -.01em;
+      margin-bottom: 6px;
+    }
+
+    .card-decision {
+      font-size: 13.5px;
+      color: #64748b;
+      line-height: 1.65;
+      margin-bottom: 20px;
+      max-width: 620px;
+    }
+
+    /* prompt box */
+    .prompt-box {
+      position: relative;
+      background: #070a0f;
+      border: 1px solid #1a2030;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .prompt-topbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border-bottom: 1px solid #1a2030;
+      background: #0a0d14;
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #3a1a1a; }
+    .dot-y { background: #3a2f0a; }
+    .dot-g { background: #0a2a1a; }
+
+    .prompt-label {
+      margin-left: 6px;
+      font-size: 10px;
+      font-weight: 500;
+      font-family: 'JetBrains Mono', monospace;
+      color: #2d3748;
+      letter-spacing: .08em;
+    }
+
+    .prompt-text {
+      padding: 18px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.8;
+      color: #7c8fa8;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* ── per-card colours ── */
+    .s1 .card-border  { background: linear-gradient(135deg, var(--c1), transparent 60%); }
+    .s1 .card-ghost   { color: var(--c1); }
+    .s1 .step-pill    { background: var(--c1d); color: var(--c1); }
+    .s1 .tag          { background: var(--c1d); color: var(--c1); }
+    .s1 .card-title   { color: #c7d2fe; }
+    .s1 .card:hover   { box-shadow: 0 8px 40px rgba(99,102,241,.12); }
+
+    .s2 .card-border  { background: linear-gradient(135deg, var(--c2), transparent 60%); }
+    .s2 .card-ghost   { color: var(--c2); }
+    .s2 .step-pill    { background: var(--c2d); color: var(--c2); }
+    .s2 .tag          { background: var(--c2d); color: var(--c2); }
+    .s2 .card-title   { color: #a5f3fc; }
+    .s2 .card:hover   { box-shadow: 0 8px 40px rgba(6,182,212,.12); }
+
+    .s3 .card-border  { background: linear-gradient(135deg, var(--c3), transparent 60%); }
+    .s3 .card-ghost   { color: var(--c3); }
+    .s3 .step-pill    { background: var(--c3d); color: var(--c3); }
+    .s3 .tag          { background: var(--c3d); color: var(--c3); }
+    .s3 .card-title   { color: #a7f3d0; }
+    .s3 .card:hover   { box-shadow: 0 8px 40px rgba(16,185,129,.12); }
+
+    .s4 .card-border  { background: linear-gradient(135deg, var(--c4), transparent 60%); }
+    .s4 .card-ghost   { color: var(--c4); }
+    .s4 .step-pill    { background: var(--c4d); color: var(--c4); }
+    .s4 .tag          { background: var(--c4d); color: var(--c4); }
+    .s4 .card-title   { color: #fde68a; }
+    .s4 .card:hover   { box-shadow: 0 8px 40px rgba(245,158,11,.12); }
+
+    .s5 .card-border  { background: linear-gradient(135deg, var(--c5), transparent 60%); }
+    .s5 .card-ghost   { color: var(--c5); }
+    .s5 .step-pill    { background: var(--c5d); color: var(--c5); }
+    .s5 .tag          { background: var(--c5d); color: var(--c5); }
+    .s5 .card-title   { color: #bfdbfe; }
+    .s5 .card:hover   { box-shadow: 0 8px 40px rgba(59,130,246,.12); }
+
+    .s6 .card-border  { background: linear-gradient(135deg, var(--c6), transparent 60%); }
+    .s6 .card-ghost   { color: var(--c6); }
+    .s6 .step-pill    { background: var(--c6d); color: var(--c6); }
+    .s6 .tag          { background: var(--c6d); color: var(--c6); }
+    .s6 .card-title   { color: #fecaca; }
+    .s6 .card:hover   { box-shadow: 0 8px 40px rgba(239,68,68,.12); }
+
+    /* ── footer ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 0 0 48px;
+      color: #1e293b;
+      font-size: 12px;
+      letter-spacing: .06em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-badge">Apex Program 2026</div>
+    <h1>Car Shopping AI<br/><span>Build Walkthrough</span></h1>
+    <p class="hero-sub">
+      <b>Flask</b> &nbsp;·&nbsp; <b>Next.js</b> &nbsp;·&nbsp; <b>Claude API</b> &nbsp;·&nbsp; <b>FastMCP</b> &nbsp;·&nbsp; <b>SQLite</b>
+    </p>
+    <div class="hero-divider"></div>
+  </div>
+
+  <div class="grid">
+
+
+
+    
+    <!-- 1 -->
+    <div class="card s1">
+      <div class="card-border"></div>
+      <div class="card-inner">
+        <div class="card-ghost">1</div>
+        <div class="card-head">
+          <span class="step-pill">PROMPT 1</span>
+          <span class="tag">Architecture</span>
+        </div>
+        <div class="card-title">One agent or two?</div>
+        <div class="card-decision">First decision — shaped the entire system. Separate agents mean separate system prompts, separate session histories, and clean isolation between concerns.</div>
+        <div class="prompt-box">
+          <div class="prompt-topbar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="prompt-label">prompt.txt</span>
+          </div>
+          <div class="prompt-text">Building a car shopping AI for a big company . Users chat naturally to find cars from a Database, get trade-in estimates, and see financing options. Stack: Flask, Next.js, Claude API.
+
+Should car search and trade-in be one agent or two completely separate ones with their own system prompts and session histories? And should the search/estimation logic be Python functions inside the agent or MCP tools Claude calls? Want the AI layer clean, separate from business logic.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="card s2">
+      <div class="card-border"></div>
+      <div class="card-inner">
+        <div class="card-ghost">2</div>
+        <div class="card-head">
+          <span class="step-pill">PROMPT 2</span>
+          <span class="tag">Architecture</span>
+        </div>
+        <div class="card-title">System Architecture</div>
+        <div class="card-decision">Blueprint before code. Defined components, data flow, and tech stack in a clear, visualizable way so the next step could be an actionable roadmap.</div>
+        <div class="prompt-box">
+          <div class="prompt-topbar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="prompt-label">prompt.txt</span>
+          </div>
+          <div class="prompt-text">Design a system architecture for a car shopping AI agent with two agents: one for trade-in estimates and one for car search. The car search agent should use the NHTSA API and the government fuel API. Users should be able to chat naturally to search cars, get trade-in values, and explore financing options. Suggest components, data flow, and tech stack including Flask, Next.js, Claude API, SQLite for the backend database, and MCP (MCP client, MCP server) in a clear, visualizable way</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="card s3">
+      <div class="card-border"></div>
+      <div class="card-inner">
+        <div class="card-ghost">3</div>
+        <div class="card-head">
+          <span class="step-pill">PROMPT 3</span>
+          <span class="tag">MCP Server</span>
+        </div>
+        <div class="card-title">Implementation Plan</div>
+        <div class="card-decision">Turned architecture into a developer roadmap — key modules, agent responsibilities, integration points, and suggested order of development.</div>
+        <div class="prompt-box">
+          <div class="prompt-topbar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="prompt-label">prompt.txt</span>
+          </div>
+          <div class="prompt-text">Based on the system architecture above, create a step-by-step implementation plan for building the car shopping AI agent with two agents: trade-in and car search. Include key modules, agent responsibilities, integration points, how to use NHTSA and government fuel APIs, tech stack usage, MCP setup (client and server), SQLite database integration, and suggested order of development. Make it practical and human-readable, like a real roadmap for developers.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="card s4">
+      <div class="card-border"></div>
+      <div class="card-inner">
+        <div class="card-ghost">4</div>
+        <div class="card-head">
+          <span class="step-pill">PROMPT 4</span>
+          <span class="tag">MCP Server</span>
+        </div>
+        <div class="card-title">Build the MCP server with two tools</div>
+        <div class="card-decision">First version — MCP spawned a new session per request and shut down after each task. Got the two tools working before worrying about the persistent connection.</div>
+        <div class="prompt-box">
+          <div class="prompt-topbar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="prompt-label">prompt.txt</span>
+          </div>
+          <div class="prompt-text">Build a FastMCP server on port with two tools: search_cars that filters a cars from SQLite database (cars table in inventory.db) and estimate_trade_in that reads a trade_in_rates table (trade_in_rates table in inventory.db).
+Register both tools and run on SSE transport.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="card s5">
+      <div class="card-border"></div>
+      <div class="card-inner">
+        <div class="card-ghost">5</div>
+        <div class="card-head">
+          <span class="step-pill">PROMPT 5</span>
+          <span class="tag">Infrastructure</span>
+        </div>
+        <div class="card-title">Persistent MCP connection, not per-call</div>
+        <div class="card-decision">Spawning a new MCP session per tool call added too much latency. One shared session held open at startup, serialized with a threading lock.</div>
+        <div class="prompt-box">
+          <div class="prompt-topbar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="prompt-label">prompt.txt</span>
+          </div>
+          <div class="prompt-text">Set up a FastMCP server on port over SSE with both tools registered — search_cars and estimate_trade_in. Flask connects once at startup and keeps the connection alive permanently — I tried spawning a new session per tool call and the latency was bad.
+
+Both agents share the same MCP session so needs a threading.Lock to serialise calls. Connection should retry up to 30 times with 1 second sleep in case the MCP server is still starting when Flask comes up.</div>
+          <div style="border-top:1px solid #1e2535;padding:10px 20px;font-size:11px;color:#64748b;font-family:'JetBrains Mono',monospace;letter-spacing:.03em;">
+            ⚑ &nbsp;Ensure the implementation is correct, the existing flow is preserved, and nothing breaks with the rest of the system.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="card s6">
+      <div class="card-border"></div>
+      <div class="card-inner">
+        <div class="card-ghost">6</div>
+        <div class="card-head">
+          <span class="step-pill">PROMPT 6</span>
+          <span class="tag">Core Logic</span>
+        </div>
+        <div class="card-title">The agent loop — this while loop is the system</div>
+        <div class="card-decision">Load history → append message → call Claude → if tool_use, execute and loop → if end_turn, save and return. Everything else is plumbing around this.</div>
+        <div class="prompt-box">
+          <div class="prompt-topbar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="prompt-label">prompt.txt</span>
+          </div>
+          <div class="prompt-text">Write the car search agent loop. History stored in SQLite under key search:{session_id}. Flow: load history → append user message → call Claude with system prompt + tool definitions → if stop_reason is tool_use, call mcp_session.call_tool(name, input), append assistant content + tool_result, loop again → if end_turn, save history and return final text.
+
+MAX_AGENT_TURNS = 10 cap. Also capture the raw car dicts from search_cars separately so Flask can return them to the frontend alongside the text response.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="card s5">
+      <div class="card-border"></div>
+      <div class="card-inner">
+        <div class="card-ghost">7</div>
+        <div class="card-head">
+          <span class="step-pill">PROMPT 7</span>
+          <span class="tag">Search Tool</span>
+        </div>
+        <div class="card-title">Scoring results, not just filtering them</div>
+        <div class="card-decision">Filter narrows the set. Score ranks it. Price 50%, mileage 30%, year 20% — normalised across results. External API calls only on the top 3, not all 20.</div>
+        <div class="prompt-box">
+          <div class="prompt-topbar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="prompt-label">prompt.txt</span>
+          </div>
+          <div class="prompt-text">My cars.csv columns: make, model, year, trim, price, mileage, condition, color, drive_type, location, vin, source.
+
+Write search_cars filtering by make, model, year (single or range like 2018-2022), budget, max_mileage, condition, location. Score results — price 50%, mileage 30%, year 20%, normalised across filtered set. Return top 20 sorted by score. Only enrich top 3 with NHTSA safety + fuel economy — don't want external API calls for all 20 results.</div>
+          <div style="border-top:1px solid #1e2535;padding:10px 20px;font-size:11px;color:#64748b;font-family:'JetBrains Mono',monospace;letter-spacing:.03em;">
+            ⚑ &nbsp;Ensure the implementation is correct, the existing flow is preserved, and nothing breaks with the rest of the system.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="card s6">
+      <div class="card-border"></div>
+      <div class="card-inner">
+        <div class="card-ghost">8</div>
+        <div class="card-head">
+          <span class="step-pill">PROMPT 8</span>
+          <span class="tag">Bug Fix</span>
+        </div>
+        <div class="card-title">Claude's API enforces tool message pairing</div>
+        <div class="card-decision">Naively trimming to last N messages split a tool_use from its tool_result across the cut boundary. The API rejects that. Fix: scan backward and always keep pairs intact.</div>
+        <div class="prompt-box">
+          <div class="prompt-topbar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="prompt-label">prompt.txt</span>
+          </div>
+          <div class="prompt-text">Agent throws `messages: tool_use and tool_result ids must match and appear in pairs` when I trim history to last 8 messages. My trim is splitting tool_use from its tool_result across the cut boundary — how do I always keep them as a pair?</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>Car Shopping AI &nbsp;·&nbsp; Built with Claude API + FastMCP &nbsp;·&nbsp; Apex 2026</footer>
+
+</body>
+</html>

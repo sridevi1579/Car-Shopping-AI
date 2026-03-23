@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AutoCar — Demo</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: #0d1117;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: #e6edf3;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(13,17,23,0.97);
+  border-bottom: 1px solid #21262d;
+  display: flex; align-items: center; gap: 4px;
+  padding: 0 20px; height: 44px;
+}
+.nav-brand { font-size: 13px; font-weight: 700; color: #58a6ff; margin-right: 14px; }
+.nav-link {
+  font-size: 11px; color: #6e7681; text-decoration: none;
+  padding: 4px 10px; border-radius: 5px; letter-spacing: 0.03em;
+  transition: color 0.15s, background 0.15s;
+}
+.nav-link:hover { color: #e6edf3; background: #21262d; }
+
+/* ── SECTION ── */
+section {
+  min-height: 100vh; display: flex;
+  flex-direction: column; justify-content: center; align-items: center;
+  padding: 72px 32px 52px; border-bottom: 1px solid #21262d; position: relative;
+}
+
+.wrap { width: 100%; max-width: 920px; }
+
+.tag {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #484f58; margin-bottom: 10px; text-align: center;
+}
+.title {
+  font-size: 26px; font-weight: 700; color: #e6edf3;
+  margin-bottom: 4px; text-align: center;
+}
+.title span { color: #58a6ff; }
+.desc {
+  font-size: 13px; color: #6e7681; margin-bottom: 32px;
+  text-align: center; max-width: 560px; margin-left: auto; margin-right: auto;
+}
+
+/* ── GRID ── */
+.grid { display: grid; gap: 14px; }
+.g2 { grid-template-columns: 1fr 1fr; }
+.g3 { grid-template-columns: 1fr 1fr 1fr; }
+.g4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+/* ── CARD ── */
+.card {
+  background: #161b22; border: 1.5px solid #21262d;
+  border-radius: 10px; padding: 18px 20px;
+}
+.ch { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+.cb { font-size: 12.5px; color: #8b949e; line-height: 1.65; }
+.cb ul { padding-left: 16px; }
+.cb li { margin-bottom: 5px; }
+.cb li b { color: #e6edf3; font-weight: 600; }
+
+.cb { font-size: 12.5px; color: #8b949e; line-height: 1.65; }
+
+.c-b  { border-color: #1f6feb; } .c-b  .ch { color: #58a6ff; }
+.c-g  { border-color: #2ea043; } .c-g  .ch { color: #3fb950; }
+.c-y  { border-color: #d29922; } .c-y  .ch { color: #e3b341; }
+.c-p  { border-color: #8957e5; } .c-p  .ch { color: #d2a8ff; }
+.c-r  { border-color: #da3633; } .c-r  .ch { color: #ff7b72; }
+
+/* ── BADGE ── */
+.badge {
+  display: inline-block; font-size: 10px; font-weight: 600;
+  padding: 2px 9px; border-radius: 20px; margin: 2px 3px 0 0;
+}
+.bb { background: #1f3a5f; color: #79c0ff; border: 1px solid #1f6feb; }
+.bg { background: #0e2418; color: #7ee787; border: 1px solid #2ea043; }
+.by { background: #2b2000; color: #f0c84b; border: 1px solid #d29922; }
+.bp { background: #1e0f38; color: #d2a8ff; border: 1px solid #8957e5; }
+.br { background: #2d1015; color: #ff7b72; border: 1px solid #da3633; }
+
+/* ── INLINE CODE ── */
+code {
+  font-family: 'Courier New', monospace; font-size: 11px;
+  background: #0d1117; color: #e3b341;
+  padding: 1px 5px; border-radius: 4px; border: 1px solid #21262d;
+}
+
+/* ── HERO ── */
+.hero-title {
+  font-size: 46px; font-weight: 800; color: #58a6ff;
+  margin-bottom: 8px; text-align: center; letter-spacing: -0.02em;
+}
+.hero-sub {
+  font-size: 14px; color: #6e7681; text-align: center;
+  margin-bottom: 28px; letter-spacing: 0.05em; text-transform: uppercase;
+}
+.hero-desc {
+  font-size: 15px; color: #8b949e; text-align: center;
+  max-width: 500px; line-height: 1.7; margin: 0 auto 32px;
+}
+.stats {
+  display: flex; gap: 16px; justify-content: center;
+  flex-wrap: wrap; margin-bottom: 28px;
+}
+.stat {
+  background: #161b22; border: 1px solid #21262d;
+  border-radius: 10px; padding: 14px 20px; text-align: center; min-width: 90px;
+}
+.stat-v { font-size: 24px; font-weight: 700; color: #58a6ff; }
+.stat-l { font-size: 10px; color: #484f58; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* ── DIAGRAM WRAP ── */
+.dbox {
+  background: #161b22; border: 1px solid #21262d;
+  border-radius: 12px; padding: 28px; overflow-x: auto;
+}
+
+/* ── SLIDE NUM ── */
+.snum {
+  position: absolute; bottom: 18px; right: 22px;
+  font-size: 10px; color: #30363d; letter-spacing: 0.06em;
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">AutoCar</span>
+  <a class="nav-link" href="#s1">Overview</a>
+  <a class="nav-link" href="#s2">Multi-Agent</a>
+  <a class="nav-link" href="#simple-arch">High-Level</a>
+  <a class="nav-link" href="#arch">Architecture</a>
+  <a class="nav-link" href="#flows">Agent Flows</a>
+  <a class="nav-link" href="#s3">Tech</a>
+  <a class="nav-link" href="#s4">Future</a>
+  <a class="nav-link" href="#s5">Evolved</a>
+</nav>
+
+
+<!-- ══════════════════════════════════════
+     SLIDE 1 — OVERVIEW
+══════════════════════════════════════ -->
+<section id="s1">
+  <div class="wrap" style="text-align:center;">
+    <div class="hero-title">AutoCar</div>
+    <div class="hero-sub">AI Multi-Agent Car Shopping System</div>
+    <div class="hero-desc">
+      A full-stack AI system where users find, value, and finance a car through
+      natural language — powered by two specialised agents and real inventory data.
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-v">5,019</div><div class="stat-l">Car listings</div></div>
+      <div class="stat"><div class="stat-v">2</div><div class="stat-l">AI Agents</div></div>
+      <div class="stat"><div class="stat-v">MCP</div><div class="stat-l">Tool protocol</div></div>
+      <div class="stat"><div class="stat-v">3</div><div class="stat-l">External APIs</div></div>
+    </div>
+    <div>
+      <span class="badge bb">Python · Flask</span>
+      <span class="badge bb">Next.js · TypeScript</span>
+      <span class="badge by">FastMCP</span>
+      <span class="badge bg">SQLite</span>
+      <span class="badge br">claude-haiku-4-5</span>
+    </div>
+  </div>
+  <div class="snum">01 / 07</div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     SLIDE 2 — MULTI-AGENT DESIGN
+══════════════════════════════════════ -->
+<section id="s2">
+  <div class="wrap">
+    <div class="title">Multi-Agent <span>Design</span></div>
+    <div class="desc">Two focused agents — each with its own tools, system prompt, and session namespace</div>
+
+    <div class="grid g2" style="margin-bottom:14px;">
+      <div class="card c-b">
+        <div class="ch">① Car Search Agent</div>
+        <div class="cb">
+          <ul>
+            <li><b>File:</b> <code>agents/carsearch_agent.py</code></li>
+            <li><b>Endpoint:</b> POST /chat</li>
+            <li><b>Tools:</b> <code>search_cars</code>, <code>estimate_trade_in</code></li>
+            <li><b>Collects:</b> make, model, year, budget, mileage via conversation</li>
+            <li><b>Enriches:</b> top 3 results with NHTSA safety + fuel economy.gov</li>
+            <li><b>Session key:</b> <code>search:{session_id}</code></li>
+          </ul>
+        </div>
+      </div>
+      <div class="card c-g">
+        <div class="ch">② Trade-In Agent</div>
+        <div class="cb">
+          <ul>
+            <li><b>File:</b> <code>agents/tradein_agent.py</code></li>
+            <li><b>Endpoint:</b> POST /estimate</li>
+            <li><b>Tool:</b> <code>estimate_trade_in</code></li>
+            <li><b>Collects:</b> make, model, year, mileage, condition</li>
+            <li><b>Outputs:</b> trade-in value + monthly payment breakdown</li>
+            <li><b>Session key:</b> <code>tradein:{session_id}</code></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card c-y">
+      <div class="ch">Why Two Agents?</div>
+      <div class="cb" style="display:flex; gap:24px; flex-wrap:wrap;">
+        <span>Car search and trade-in are <b>completely separate conversations</b> — different goals, different tools, different rules</span>
+        <span>Each agent has a <b>focused system prompt</b> — it only knows its job</span>
+        <span>Easier to debug and change one without touching the other</span>
+      </div>
+    </div>
+  </div>
+  <div class="snum">02 / 08</div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     SIMPLE ARCHITECTURE DIAGRAM
+══════════════════════════════════════ -->
+<section id="simple-arch">
+  <div class="wrap">
+    <div class="tag">High-Level Overview</div>
+    <div class="title">System <span>Layers</span></div>
+    <div class="desc">How the system is structured from browser to data — each layer has one job</div>
+
+    <div style="width:100%;max-width:680px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:0;">
+
+      <!-- UI -->
+      <div style="width:100%;margin-bottom:6px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#484f58;margin-bottom:5px;">UI Layer</div>
+        <div style="background:#161b22;border:1.5px solid #30363d;border-radius:9px;padding:14px 16px;text-align:center;color:#c9d1d9;font-size:13px;font-weight:700;">Browser Frontend</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;margin:2px 0;">
+        <div style="width:2px;height:18px;background:linear-gradient(to bottom,#30363d88,#58a6ff44);"></div>
+        <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #58a6ff66;"></div>
+      </div>
+
+      <!-- FLASK -->
+      <div style="width:100%;margin-bottom:6px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#484f58;margin-bottom:5px;">API Layer</div>
+        <div style="background:#0c1e30;border:1.5px solid #1f6feb;border-radius:9px;padding:14px 16px;text-align:center;color:#79c0ff;font-size:13px;font-weight:700;">Flask Web Server</div>
+      </div>
+
+      <div style="display:flex;justify-content:center;gap:200px;width:100%;margin:2px 0;">
+        <div style="display:flex;flex-direction:column;align-items:center;"><div style="width:2px;height:18px;background:linear-gradient(to bottom,#30363d88,#58a6ff44);"></div><div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #58a6ff66;"></div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;"><div style="width:2px;height:18px;background:linear-gradient(to bottom,#30363d88,#58a6ff44);"></div><div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #58a6ff66;"></div></div>
+      </div>
+
+      <!-- AGENTS -->
+      <div style="width:100%;margin-bottom:6px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#484f58;margin-bottom:5px;">Agent Layer</div>
+        <div style="display:flex;gap:14px;">
+          <div style="flex:1;background:#0d1f35;border:1.5px solid #388bfd;border-radius:9px;padding:14px 16px;text-align:center;color:#a5d3ff;font-size:13px;font-weight:700;">① Car Search Agent</div>
+          <div style="flex:1;background:#0d1f35;border:1.5px solid #388bfd;border-radius:9px;padding:14px 16px;text-align:center;color:#a5d3ff;font-size:13px;font-weight:700;">② Trade-In Agent</div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:center;gap:200px;width:100%;margin:2px 0;">
+        <div style="display:flex;flex-direction:column;align-items:center;"><div style="width:2px;height:18px;background:linear-gradient(to bottom,#30363d88,#58a6ff44);"></div><div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #58a6ff66;"></div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;"><div style="width:2px;height:18px;background:linear-gradient(to bottom,#30363d88,#58a6ff44);"></div><div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #58a6ff66;"></div></div>
+      </div>
+
+      <!-- CORE -->
+      <div style="width:100%;margin-bottom:6px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#484f58;margin-bottom:5px;">Core Layer</div>
+        <div style="display:flex;gap:14px;">
+          <div style="flex:1;background:#131f17;border:1.5px solid #2ea043;border-radius:9px;padding:14px 16px;text-align:center;color:#7ee787;font-size:13px;font-weight:700;">MCP Client</div>
+          <div style="flex:1;background:#131f17;border:1.5px solid #2ea043;border-radius:9px;padding:14px 16px;text-align:center;color:#7ee787;font-size:13px;font-weight:700;">Session Store</div>
+          <div style="flex:1;background:#131f17;border:1.5px solid #2ea043;border-radius:9px;padding:14px 16px;text-align:center;color:#7ee787;font-size:13px;font-weight:700;">Agent Utils</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;margin:2px 0;">
+        <div style="width:2px;height:18px;background:linear-gradient(to bottom,#30363d88,#58a6ff44);"></div>
+        <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #58a6ff66;"></div>
+      </div>
+
+      <!-- MCP SERVER -->
+      <div style="width:100%;margin-bottom:6px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#484f58;margin-bottom:5px;">MCP Server</div>
+        <div style="background:#1e1900;border:1.5px solid #d29922;border-radius:9px;padding:14px 16px;text-align:center;color:#f0c84b;font-size:13px;font-weight:700;">FastMCP Server</div>
+      </div>
+
+      <div style="display:flex;justify-content:center;gap:200px;width:100%;margin:2px 0;">
+        <div style="display:flex;flex-direction:column;align-items:center;"><div style="width:2px;height:18px;background:linear-gradient(to bottom,#30363d88,#58a6ff44);"></div><div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #58a6ff66;"></div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;"><div style="width:2px;height:18px;background:linear-gradient(to bottom,#30363d88,#58a6ff44);"></div><div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #58a6ff66;"></div></div>
+      </div>
+
+      <!-- TOOLS -->
+      <div style="width:100%;margin-bottom:6px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#484f58;margin-bottom:5px;">Tool Layer</div>
+        <div style="display:flex;gap:14px;">
+          <div style="flex:1;background:#1a1500;border:1.5px solid #bb8009;border-radius:9px;padding:14px 16px;text-align:center;color:#e3b341;font-size:13px;font-weight:700;">search_cars</div>
+          <div style="flex:1;background:#1a1500;border:1.5px solid #bb8009;border-radius:9px;padding:14px 16px;text-align:center;color:#e3b341;font-size:13px;font-weight:700;">estimate_trade_in</div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:center;gap:200px;width:100%;margin:2px 0;">
+        <div style="display:flex;flex-direction:column;align-items:center;"><div style="width:2px;height:18px;background:linear-gradient(to bottom,#30363d88,#58a6ff44);"></div><div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #58a6ff66;"></div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;"><div style="width:2px;height:18px;background:linear-gradient(to bottom,#30363d88,#58a6ff44);"></div><div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #58a6ff66;"></div></div>
+      </div>
+
+      <!-- DATA -->
+      <div style="width:100%;margin-bottom:6px;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#484f58;margin-bottom:5px;">Data Layer</div>
+        <div style="display:flex;gap:14px;">
+          <div style="flex:1;background:#18102b;border:1.5px solid #8957e5;border-radius:9px;padding:14px 16px;text-align:center;color:#d2a8ff;font-size:13px;font-weight:700;">cars table from SQLite</div>
+          <div style="flex:1;background:#18102b;border:1.5px solid #8957e5;border-radius:9px;padding:14px 16px;text-align:center;color:#d2a8ff;font-size:13px;font-weight:700;">trade_in_rates from SQLite</div>
+          <div style="flex:1;background:#18102b;border:1.5px solid #8957e5;border-radius:9px;padding:14px 16px;text-align:center;color:#d2a8ff;font-size:13px;font-weight:700;">sessions.db</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;margin:2px 0;">
+        <div style="width:2px;height:18px;background:linear-gradient(to bottom,#30363d88,#58a6ff44);"></div>
+        <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid #58a6ff66;"></div>
+      </div>
+
+      <!-- EXTERNAL -->
+      <div style="width:100%;">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#484f58;margin-bottom:5px;">External APIs</div>
+        <div style="display:flex;gap:14px;">
+          <div style="flex:1;background:#1c1015;border:1.5px solid #da3633;border-radius:9px;padding:14px 16px;text-align:center;color:#ff7b72;font-size:13px;font-weight:700;">NHTSA</div>
+          <div style="flex:1;background:#1c1015;border:1.5px solid #da3633;border-radius:9px;padding:14px 16px;text-align:center;color:#ff7b72;font-size:13px;font-weight:700;">Fuel Economy</div>
+          <div style="flex:1;background:#1c1015;border:1.5px solid #da3633;border-radius:9px;padding:14px 16px;text-align:center;color:#ff7b72;font-size:13px;font-weight:700;">Claude API</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="snum">03 / 08</div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     ARCHITECTURE DIAGRAM
+══════════════════════════════════════ -->
+<section id="arch">
+  <div class="wrap">
+    <div class="tag">Architecture Diagram</div>
+    <div class="title">System <span>Architecture</span></div>
+    <div class="desc">All components and how they connect — from browser to data</div>
+    <div class="dbox">
+      <div class="mermaid">
+graph TD
+    FE["Browser Frontend\nNext.js 14 · React · TypeScript"]
+    FL["Flask  ·  Port 5000\napp.py — routes only"]
+    CSA["① Car Search Agent\ncarsearch_agent.py"]
+    TIA["② Trade-In Agent\ntradein_agent.py"]
+    SS["Session Store\nSQLite · 24h TTL"]
+    MC["MCP Client\nPersistent SSE"]
+    CLAUDE["Claude API\nclaude-haiku-4-5"]
+    MS["FastMCP Server\nPort 5002"]
+    SC["search_cars"]
+    ET["estimate_trade_in"]
+    DB["cars table\n5,019 listings"]
+    RATES["trade_in_rates table from SQLite"]
+    NHTSA["NHTSA API"]
+    MPG["Fuel Economy API"]
+
+    FE -->|"POST /chat"| FL
+    FE -->|"POST /estimate"| FL
+    FL -->|"routes"| CSA
+    FL -->|"routes"| TIA
+    FL -->|"read/write"| SS
+    FL -.->|"creates at startup"| MC
+    CSA -->|"AI reasoning"| CLAUDE
+    TIA -->|"AI reasoning"| CLAUDE
+    CSA -->|"tool execution"| MC
+    TIA -->|"tool execution"| MC
+    MC -->|"SSE"| MS
+    MS --> SC
+    MS --> ET
+    SC --> Database
+    SC --> NHTSA
+    SC --> MPG
+    ET --> Database
+    ET --> RATES
+
+    style FE     fill:#161b22,stroke:#30363d,color:#c9d1d9
+    style FL     fill:#0c1e30,stroke:#1f6feb,color:#79c0ff
+    style CSA    fill:#0d1f35,stroke:#388bfd,color:#a5d3ff
+    style TIA    fill:#0d1f35,stroke:#388bfd,color:#a5d3ff
+    style SS     fill:#131f17,stroke:#2ea043,color:#7ee787
+    style MC     fill:#131f17,stroke:#2ea043,color:#7ee787
+    style CLAUDE fill:#2d1015,stroke:#da3633,color:#ff7b72
+    style MS     fill:#1e1900,stroke:#d29922,color:#f0c84b
+    style SC     fill:#1a1500,stroke:#bb8009,color:#e3b341
+    style ET     fill:#1a1500,stroke:#bb8009,color:#e3b341
+    style DB    fill:#18102b,stroke:#8957e5,color:#d2a8ff
+    style RATES  fill:#18102b,stroke:#8957e5,color:#d2a8ff
+    style NHTSA  fill:#1c1015,stroke:#da3633,color:#ff7b72
+    style MPG    fill:#1c1015,stroke:#da3633,color:#ff7b72
+
+    linkStyle 0,1 stroke:#58a6ff,stroke-width:2px
+    linkStyle 2,3 stroke:#388bfd,stroke-width:2px
+    linkStyle 4,5 stroke:#3fb950,stroke-width:1.5px
+    linkStyle 6,7 stroke:#ff7b72,stroke-width:2px
+    linkStyle 8,9 stroke:#e3b341,stroke-width:2px
+    linkStyle 10 stroke:#e3b341,stroke-width:2px
+    linkStyle 11,12 stroke:#d29922,stroke-width:1.5px
+    linkStyle 13,14,15,16,17 stroke:#6e7681,stroke-width:1.5px
+      </div>
+    </div>
+
+    <!-- Arrow colour legend -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px;">
+      <span style="font-size:11px;color:#8b949e;display:flex;align-items:center;gap:6px;">
+        <span style="display:inline-block;width:28px;height:2px;background:#58a6ff;border-radius:2px;"></span>HTTP request
+      </span>
+      <span style="font-size:11px;color:#8b949e;display:flex;align-items:center;gap:6px;">
+        <span style="display:inline-block;width:28px;height:2px;background:#388bfd;border-radius:2px;"></span>Flask → Agent
+      </span>
+      <span style="font-size:11px;color:#8b949e;display:flex;align-items:center;gap:6px;">
+        <span style="display:inline-block;width:28px;height:2px;background:#3fb950;border-radius:2px;"></span>Infrastructure
+      </span>
+      <span style="font-size:11px;color:#8b949e;display:flex;align-items:center;gap:6px;">
+        <span style="display:inline-block;width:28px;height:2px;background:#ff7b72;border-radius:2px;"></span>AI reasoning (Claude)
+      </span>
+      <span style="font-size:11px;color:#8b949e;display:flex;align-items:center;gap:6px;">
+        <span style="display:inline-block;width:28px;height:2px;background:#e3b341;border-radius:2px;"></span>Tool execution (MCP)
+      </span>
+      <span style="font-size:11px;color:#8b949e;display:flex;align-items:center;gap:6px;">
+        <span style="display:inline-block;width:28px;height:2px;background:#6e7681;border-radius:2px;"></span>Data reads
+      </span>
+    </div>
+  </div>
+  <div class="snum">04 / 08</div>
+</section>
+
+
+
+
+<!-- ══════════════════════════════════════
+     AGENT FLOW DIAGRAMS
+══════════════════════════════════════ -->
+<section id="flows">
+  <div class="wrap">
+    <div class="tag">Agent Flow Diagrams</div>
+    <div class="title">How Each <span>Agent Works</span></div>
+    <div class="desc">Step-by-step workflow for each agent — from user message to final response</div>
+
+    <div class="grid g2" style="gap:20px;align-items:start;">
+
+      <!-- Car Search Agent -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#58a6ff;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">① Car Search Agent</div>
+        <div class="dbox">
+          <div class="mermaid">
+graph TD
+    S1["User sends message"]
+    S2["Flask · POST /chat"]
+    S3["Car Search Agent\nloads conversation history"]
+    S4["Claude API called\nwith history + tool definitions"]
+    S5["Claude returns\ntool_use: search_cars"]
+    S6["Agent executes via MCP Client"]
+    S7["FastMCP Server\nfilter + score cars table"]
+    S8["Enrich top 3\nNHTSA · Fuel Economy API"]
+    S9["Results returned to Agent"]
+    S10["Agent feeds tool_result\nback to Claude"]
+    S11["Claude writes final response"]
+    S12["Agent saves history\nFlask returns to Frontend"]
+
+    S1-->S2-->S3-->S4-->S5-->S6-->S7-->S8-->S9-->S10-->S11-->S12
+
+    style S1  fill:#161b22,stroke:#30363d,color:#c9d1d9
+    style S2  fill:#0c1e30,stroke:#1f6feb,color:#79c0ff
+    style S3  fill:#0d1f35,stroke:#388bfd,color:#a5d3ff
+    style S4  fill:#2d1015,stroke:#da3633,color:#ff7b72
+    style S5  fill:#2d1015,stroke:#da3633,color:#ff7b72
+    style S6  fill:#1e1900,stroke:#d29922,color:#f0c84b
+    style S7  fill:#1e1900,stroke:#d29922,color:#f0c84b
+    style S8  fill:#1c1015,stroke:#da3633,color:#ff7b72
+    style S9  fill:#1e1900,stroke:#d29922,color:#f0c84b
+    style S10 fill:#2d1015,stroke:#da3633,color:#ff7b72
+    style S11 fill:#2d1015,stroke:#da3633,color:#ff7b72
+    style S12 fill:#0c1e30,stroke:#1f6feb,color:#79c0ff
+          </div>
+        </div>
+      </div>
+
+      <!-- Trade-In Agent -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#3fb950;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">② Trade-In Agent</div>
+        <div class="dbox">
+          <div class="mermaid">
+graph TD
+    T1["User describes their car"]
+    T2["Flask · POST /estimate"]
+    T3["Trade-In Agent\nloads conversation history"]
+    T4["Claude API called\nwith history + tool definitions"]
+    T5["Claude collects info\nmake · model · year · mileage · condition"]
+    T6["Claude returns\ntool_use: estimate_trade_in"]
+    T7["Agent executes via MCP Client"]
+    T8["FastMCP Server\nbase price from cars table"]
+    T9["Condition multiplier\ntrade_in_rates table + mileage adj"]
+    T10["Trade-in value returned to Agent"]
+    T11["Agent feeds tool_result\nback to Claude"]
+    T12["Claude writes: value\n+ monthly payment breakdown"]
+    T13["Agent saves history\nFlask returns to Frontend"]
+
+    T1-->T2-->T3-->T4-->T5-->T6-->T7-->T8-->T9-->T10-->T11-->T12-->T13
+
+    style T1  fill:#161b22,stroke:#30363d,color:#c9d1d9
+    style T2  fill:#0c1e30,stroke:#1f6feb,color:#79c0ff
+    style T3  fill:#0d1f35,stroke:#388bfd,color:#a5d3ff
+    style T4  fill:#2d1015,stroke:#da3633,color:#ff7b72
+    style T5  fill:#2d1015,stroke:#da3633,color:#ff7b72
+    style T6  fill:#2d1015,stroke:#da3633,color:#ff7b72
+    style T7  fill:#1e1900,stroke:#d29922,color:#f0c84b
+    style T8  fill:#18102b,stroke:#8957e5,color:#d2a8ff
+    style T9  fill:#18102b,stroke:#8957e5,color:#d2a8ff
+    style T10 fill:#1e1900,stroke:#d29922,color:#f0c84b
+    style T11 fill:#2d1015,stroke:#da3633,color:#ff7b72
+    style T12 fill:#2d1015,stroke:#da3633,color:#ff7b72
+    style T13 fill:#0c1e30,stroke:#1f6feb,color:#79c0ff
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Colour legend -->
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:16px;">
+      <span style="font-size:11px;color:#8b949e;display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:3px;background:#0c1e30;border:1px solid #1f6feb;display:inline-block;"></span>Flask</span>
+      <span style="font-size:11px;color:#8b949e;display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:3px;background:#0d1f35;border:1px solid #388bfd;display:inline-block;"></span>Agent</span>
+      <span style="font-size:11px;color:#8b949e;display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:3px;background:#2d1015;border:1px solid #da3633;display:inline-block;"></span>Claude API</span>
+      <span style="font-size:11px;color:#8b949e;display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:3px;background:#1e1900;border:1px solid #d29922;display:inline-block;"></span>MCP / FastMCP</span>
+      <span style="font-size:11px;color:#8b949e;display:flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:3px;background:#18102b;border:1px solid #8957e5;display:inline-block;"></span>Data / DB</span>
+    </div>
+  </div>
+  <div class="snum">05 / 08</div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     SLIDE 3 — TECH DECISIONS
+══════════════════════════════════════ -->
+<section id="s3">
+  <div class="wrap">
+    <div class="title">Key Technical <span>Decisions</span></div>
+    <div class="desc">Engineering choices made to keep the system reliable and cost-efficient</div>
+
+    <div class="grid g3">
+      <div class="card c-y">
+        <div class="ch">MCP — Persistent Connection</div>
+        <div class="cb">
+          <ul>
+            <li>One SSE connection for the whole Flask lifetime</li>
+            <li>Thread-safe lock serialises tool calls</li>
+            <li>Not a subprocess per request — saves latency</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card c-b">
+        <div class="ch">Deal Scoring Formula</div>
+        <div class="cb">
+          <ul>
+            <li>Normalised across all filtered results</li>
+            <li><b>Price 50%</b> · <b>Mileage 30%</b> · <b>Year 20%</b></li>
+            <li>Returns top 20, enriches only top 3 (API cost control)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card c-g">
+        <div class="ch">History Trimming</div>
+        <div class="cb">
+          <ul>
+            <li>Keeps last 8 turns (search) / 6 turns (trade-in)</li>
+            <li>Always preserves <b>tool_use + tool_result pairs</b></li>
+            <li>Claude API requires chronological order — never reorders</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card c-p">
+        <div class="ch">Session Store</div>
+        <div class="cb">
+          <ul>
+            <li>SQLite WAL mode — safe concurrent reads</li>
+            <li>24h TTL — auto-expires on read</li>
+            <li>Namespaced keys prevent agents seeing each other's history</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card c-r">
+        <div class="ch">Trade-In Valuation</div>
+        <div class="cb">
+          <ul>
+            <li>Base price from real DataBase market data (not hardcoded)</li>
+            <li>Condition multiplier from <code>trade_in_rates table</code></li>
+            <li>Mileage adj: ±2% per 10k miles from expected wear</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card c-y">
+        <div class="ch">Core Agentic Loop</div>
+        <div class="cb">
+          <ul>
+            <li>Claude returns <code>tool_use</code> — agent executes via MCP</li>
+            <li>Result fed back as <code>tool_result</code> — Claude responds</li>
+            <li>Loop repeats until Claude returns final text (<code>end_turn</code>)</li>
+            <li>Safety cap: <b>MAX_AGENT_TURNS = 10</b> prevents infinite loops</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="snum">06 / 08</div>
+</section>
+
+
+
+
+
+
+
+<!-- ══════════════════════════════════════
+     SLIDE 5 — HOW IT EVOLVED
+══════════════════════════════════════ -->
+<section id="s5">
+  <div class="wrap">
+    <div class="title">Things I <span>Got Wrong First</span></div>
+    <div class="desc">Design decisions I made, realised were wrong, and fixed — part of the build process</div>
+
+    <div class="grid g3">
+      <div class="card c-b">
+        <div class="ch">MCP Session Per Tool Call → Persistent Connection</div>
+        <div class="cb">
+          <ul>
+            <li><b>First version:</b> created a new MCP session on every single tool call — full connection handshake each time</li>
+            <li>Added latency on every request and made the code harder to manage</li>
+            <li><b>Fixed:</b> one persistent SSE connection created at Flask startup, shared across all requests with a thread-safe lock — much faster</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card c-b">
+        <div class="ch">Each Agent on a Separate Port → Single MCP Server</div>
+        <div class="cb">
+          <ul>
+            <li><b>First version:</b> each agent had its own MCP server running on a different port — search on one, trade-in on another</li>
+            <li>Had to manage multiple processes, multiple connections, and more config</li>
+            <li><b>Fixed:</b> one FastMCP server on port 5002 with both tools registered — simpler, one connection, one process</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card c-b">
+        <div class="ch">Car Search & Trade-In on Separate Ports → One Frontend</div>
+        <div class="cb">
+          <ul>
+            <li><b>First version:</b> car search UI and trade-in UI ran as separate frontends on different ports — two Next.js apps</li>
+            <li>Felt disconnected, users had to navigate between urls manually, no shared state</li>
+            <li><b>Fixed:</b> single Next.js app with proper routing — car search, trade-in, and summary all as pages under one port</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="snum">08 / 08</div>
+</section>
+
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      darkMode: true,
+      background: '#161b22',
+      primaryColor: '#0d1f35',
+      primaryTextColor: '#a5d3ff',
+      primaryBorderColor: '#388bfd',
+      lineColor: '#4d9af5',
+      secondaryColor: '#161b22',
+      tertiaryColor: '#0d1117',
+      edgeLabelBackground: '#161b22',
+      clusterBkg: '#161b22',
+      clusterBorder: '#21262d',
+      titleColor: '#58a6ff',
+      actorBkg: '#0d1f35',
+      actorBorder: '#388bfd',
+      actorTextColor: '#a5d3ff',
+      actorLineColor: '#388bfd',
+      signalColor: '#8b949e',
+      signalTextColor: '#e6edf3',
+      activationBorderColor: '#1f6feb',
+      activationBkgColor: '#0c1e30',
+      noteBkgColor: '#1e1900',
+      noteBorderColor: '#d29922',
+      noteTextColor: '#e3b341'
+    }
+  });
+</script>
+
+</body>
+</html>

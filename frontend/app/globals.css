@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Markdown inside agent bubbles */
+.agent-markdown h1,
+.agent-markdown h2,
+.agent-markdown h3 {
+  font-family: 'Syne', sans-serif;
+  color: #1e3a8a;
+  margin: 0.75rem 0 0.4rem;
+  font-size: 1.05rem;
+}
+
+.agent-markdown p {
+  margin: 0.4rem 0;
+  line-height: 1.65;
+}
+
+.agent-markdown strong {
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+.agent-markdown a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.agent-markdown ul,
+.agent-markdown ol {
+  padding-left: 1.4rem;
+  margin: 0.4rem 0;
+}
+
+.agent-markdown li {
+  margin: 0.2rem 0;
+}
+
+.agent-markdown hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 0.75rem 0;
+}
+
+/* Tables */
+.agent-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 0.85rem;
+  margin: 0.75rem 0;
+}
+
+.agent-markdown thead tr {
+  background-color: #1e3a8a;
+  color: #ffffff;
+}
+
+.agent-markdown thead th {
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.agent-markdown tbody tr:nth-child(even) {
+  background-color: #f1f5f9;
+}
+
+.agent-markdown tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+.agent-markdown tbody td {
+  padding: 7px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: top;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}

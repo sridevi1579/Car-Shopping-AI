@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>CarAgent — Architecture</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0d1117;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: #e6edf3;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px 24px 48px;
+  }
+
+  h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #58a6ff;
+    margin-bottom: 4px;
+    text-align: center;
+    letter-spacing: 0.03em;
+  }
+
+  .subtitle {
+    font-size: 12px;
+    color: #6e7681;
+    margin-bottom: 40px;
+    text-align: center;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── DIAGRAM WRAPPER ── */
+  .diagram {
+    width: 100%;
+    max-width: 820px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* ── LAYER ── */
+  .layer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .layer-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #484f58;
+    margin-bottom: 6px;
+    align-self: flex-start;
+    padding-left: 2px;
+  }
+
+  .row {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  /* ── BOX ── */
+  .box {
+    border-radius: 9px;
+    padding: 12px 16px;
+    border: 1.5px solid;
+    text-align: center;
+    flex: 1;
+  }
+
+  .box-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+
+  .box-sub {
+    font-size: 11px;
+    opacity: 0.6;
+    line-height: 1.45;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 9.5px;
+    font-weight: 600;
+    padding: 1px 8px;
+    border-radius: 20px;
+    margin-top: 6px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── COLOURS ── */
+  .c-ui     { background: #161b22; border-color: #30363d;  color: #c9d1d9; }
+  .c-flask  { background: #0c1e30; border-color: #1f6feb;  color: #79c0ff; }
+  .c-agent  { background: #0d1f35; border-color: #388bfd;  color: #a5d3ff; }
+  .c-core   { background: #131f17; border-color: #2ea043;  color: #7ee787; }
+  .c-mcp    { background: #1e1900; border-color: #d29922;  color: #f0c84b; }
+  .c-tool   { background: #1a1500; border-color: #bb8009;  color: #e3b341; }
+  .c-data   { background: #18102b; border-color: #8957e5;  color: #d2a8ff; }
+  .c-api    { background: #1c1015; border-color: #da3633;  color: #ff7b72; }
+
+  .badge-blue   { background: #1f3a5f; color: #79c0ff; border: 1px solid #1f6feb; }
+  .badge-green  { background: #0e2418; color: #7ee787; border: 1px solid #2ea043; }
+  .badge-gold   { background: #2b2000; color: #f0c84b; border: 1px solid #d29922; }
+  .badge-purple { background: #1e0f38; color: #d2a8ff; border: 1px solid #8957e5; }
+  .badge-red    { background: #2d1015; color: #ff7b72; border: 1px solid #da3633; }
+  .badge-orange { background: #2b1800; color: #ffa657; border: 1px solid #e3661c; }
+
+  /* ── ARROWS ── */
+  .arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 4px 0;
+  }
+
+  .arrow-line {
+    width: 2px;
+    height: 20px;
+    background: linear-gradient(to bottom, #30363d88, #58a6ff44);
+  }
+
+  .arrow-head {
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid #58a6ff66;
+  }
+
+  .arrow-label {
+    font-size: 10px;
+    color: #484f58;
+    letter-spacing: 0.05em;
+    margin: 2px 0;
+    white-space: nowrap;
+  }
+
+  /* arrows side by side */
+  .arrows-row {
+    display: flex;
+    justify-content: center;
+    gap: 200px;
+    width: 100%;
+    margin: 4px 0;
+  }
+
+  /* shared indicator */
+  .shared-banner {
+    width: 100%;
+    text-align: center;
+    font-size: 10px;
+    color: #e3b341;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin: 2px 0 0;
+  }
+
+  hr.dashed {
+    width: 100%;
+    border: none;
+    border-top: 1px dashed #21262d;
+    margin: 4px 0;
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 28px;
+    padding: 12px 18px;
+    border: 1px solid #21262d;
+    border-radius: 10px;
+    background: #161b22;
+    max-width: 820px;
+    width: 100%;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #6e7681;
+  }
+  .legend-dot {
+    width: 11px; height: 11px;
+    border-radius: 3px;
+    border: 2px solid;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>CarAgent — AI Multi-Agent System</h1>
+<p class="subtitle">High-Level Architecture</p>
+
+<div class="diagram">
+
+  <!-- ══ UI ══ -->
+  <div class="layer">
+    <div class="layer-label">UI Layer</div>
+    <div class="row">
+      <div class="box c-ui">
+        <div class="box-title">Browser Frontend</div>
+        <div class="box-sub">Next.js 14 · React · TypeScript · Tailwind</div>
+        <span class="badge badge-blue">Static · served by Flask</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">
+    <div class="arrow-label">POST /chat &nbsp; POST /estimate &nbsp; GET static</div>
+    <div class="arrow-line"></div>
+    <div class="arrow-head"></div>
+  </div>
+
+  <!-- ══ FLASK ══ -->
+  <div class="layer">
+    <div class="layer-label">API Layer · Port 5000</div>
+    <div class="row">
+      <div class="box c-flask">
+        <div class="box-title">Flask Web Server</div>
+        <div class="box-sub">Routes · CORS · Static serving</div>
+        <span class="badge badge-blue">app.py</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrows-row">
+    <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+    <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+  </div>
+
+  <!-- ══ AGENTS ══ -->
+  <div class="layer">
+    <div class="layer-label">Agent Layer — Claude claude-haiku-4-5</div>
+    <div class="row">
+
+      <div class="box c-agent">
+        <div class="box-title">① Car Search Agent</div>
+        <div class="box-sub">Finds cars by budget, make, model<br>+ inline trade-in budget boost</div>
+        <span class="badge badge-blue">search_cars · estimate_trade_in</span>
+      </div>
+
+      <div class="box c-agent">
+        <div class="box-title">② Trade-In Agent</div>
+        <div class="box-sub">Estimates car value<br>+ financing calculation</div>
+        <span class="badge badge-blue">estimate_trade_in</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="arrows-row">
+    <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+    <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+  </div>
+
+  <!-- ══ CORE ══ -->
+  <div class="layer">
+    <div class="layer-label">Core Layer — Shared Infrastructure</div>
+    <div class="row">
+
+      <div class="box c-core">
+        <div class="box-title">MCP Client</div>
+        <div class="box-sub">Persistent SSE · thread-safe</div>
+        <span class="badge badge-green">core/mcp_client.py</span>
+      </div>
+
+      <div class="box c-core">
+        <div class="box-title">Session Store</div>
+        <div class="box-sub">SQLite · 24h TTL</div>
+        <span class="badge badge-green">core/session_store.py</span>
+      </div>
+
+      <div class="box c-core">
+        <div class="box-title">Agent Utils</div>
+        <div class="box-sub">Smart history trimming</div>
+        <span class="badge badge-green">core/agent_utils.py</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="arrow">
+    <div class="arrow-label">SSE · 127.0.0.1:5002</div>
+    <div class="arrow-line"></div>
+    <div class="arrow-head"></div>
+  </div>
+
+  <!-- ══ MCP SERVER ══ -->
+  <div class="layer">
+    <div class="layer-label">MCP Server · Port 5002</div>
+    <div class="row">
+      <div class="box c-mcp">
+        <div class="box-title">FastMCP Server</div>
+        <div class="box-sub">Shared tool layer — both agents, one server</div>
+        <span class="badge badge-gold">mcp_server/server.py</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrows-row">
+    <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+    <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+  </div>
+
+  <!-- ══ TOOLS ══ -->
+  <div class="layer">
+    <div class="layer-label">Tool Layer</div>
+    <div class="row">
+
+      <div class="box c-tool">
+        <div class="box-title">search_cars</div>
+        <div class="box-sub">Filter · score · enrich<br>→ cars.csv + live APIs</div>
+        <span class="badge badge-gold">Agent ① only</span>
+      </div>
+
+      <div class="box c-tool">
+        <div class="box-title">estimate_trade_in</div>
+        <div class="box-sub">Base price × condition<br>± mileage → nearest $100</div>
+        <span class="badge badge-orange">Shared — Agent ① &amp; ②</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="arrows-row">
+    <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+    <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+  </div>
+
+  <!-- ══ DATA ══ -->
+  <div class="layer">
+    <div class="layer-label">Data Layer</div>
+    <div class="row">
+
+      <div class="box c-data">
+        <div class="box-title">cars.csv</div>
+        <div class="box-sub">5 000 listings · 10 AZ cities</div>
+        <span class="badge badge-purple">Loaded at startup</span>
+      </div>
+
+      <div class="box c-data">
+        <div class="box-title">trade_in_rates.csv</div>
+        <div class="box-sub">Condition multipliers</div>
+        <span class="badge badge-purple">Loaded at startup</span>
+      </div>
+
+      <div class="box c-data">
+        <div class="box-title">sessions.db</div>
+        <div class="box-sub">SQLite WAL · 24h TTL</div>
+        <span class="badge badge-purple">Runtime</span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="arrow">
+    <div class="arrow-label">Live API calls · top results only</div>
+    <div class="arrow-line"></div>
+    <div class="arrow-head"></div>
+  </div>
+
+  <!-- ══ EXTERNAL APIs ══ -->
+  <div class="layer">
+    <div class="layer-label">External APIs</div>
+    <div class="row">
+
+      <div class="box c-api">
+        <div class="box-title">NHTSA</div>
+        <div class="box-sub">Safety ratings</div>
+        <span class="badge badge-red">api.nhtsa.gov</span>
+      </div>
+
+      <div class="box c-api">
+        <div class="box-title">Fuel Economy</div>
+        <div class="box-sub">City / Hwy MPG</div>
+        <span class="badge badge-red">fueleconomy.gov</span>
+      </div>
+
+      <div class="box c-api">
+        <div class="box-title">Claude API</div>
+        <div class="box-sub">claude-haiku-4-5</div>
+        <span class="badge badge-red">api.anthropic.com</span>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end .diagram -->
+
+<!-- ══ LEGEND ══ -->
+<div class="legend">
+  <div class="legend-item">
+    <div class="legend-dot" style="border-color:#1f6feb; background:#0c1e30"></div>
+    Flask / Agents
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="border-color:#2ea043; background:#131f17"></div>
+    Core Infrastructure
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="border-color:#d29922; background:#1e1900"></div>
+    MCP Server + Tools
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="border-color:#8957e5; background:#18102b"></div>
+    Data Layer
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="border-color:#da3633; background:#1c1015"></div>
+    External APIs
+  </div>
+  <div class="legend-item" style="margin-left:12px; padding-left:12px; border-left:1px solid #21262d;">
+    ① Car Search &nbsp;·&nbsp; ② Trade-In
+  </div>
+</div>
+
+</body>
+</html>

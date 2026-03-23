@@ -1,0 +1,8 @@
+{
+    "mcpServers": {
+      "car-search": {
+        "command": "python",
+        "args": ["C:\\Users\\sride\\OneDrive\\Documents\\caragent\\mcp_server\\server.py"]
+      }
+    }
+  }
